@@ -16,34 +16,50 @@ interface Product {
 }
 
 class InventoryManager<T extends Product> {
-  products = []
+  products: T[] = [];
 
-  addProduct(product) {
+  addProduct(product: T): string {
+    const exists = this.products.some((p) => p.id === product.id);
+    if (exists) return `Product with id ${product.id} already exists.`;
 
+    this.products.push(product);
+    return `Product ${product.name} added successfully!`;
   }
 
-  updateProduct(id, update) {
+  updateProduct(id: number, update: Partial<T>): string {
+    const product = this.products.find((p) => p.id === id);
+    if (!product) return `Product ${id} not found.`;
 
+    Object.assign(product, update);
+    return `Product ${id} updated successfully!`;
   }
 
-  getProduct(id) {
-
+  getProduct(id: number): T | string {
+    const product = this.products.find((p) => p.id === id);
+    return product ?? "Product not found";
   }
 
-  getAllProducts() {
-
+  getAllProducts(): T[] {
+    return this.products;
   }
 
-  removeProduct(id) {
+  removeProduct(id: number): string {
+    const index = this.products.findIndex((p) => p.id === id);
+    if (index === -1) return `Product ${id} not found.`;
 
+    this.products.splice(index, 1);
+    return `Product ${id} removed successfully!`;
   }
 }
-
 // Test cases
 const inventory = new InventoryManager();
 
-console.log(inventory.addProduct({ id: 1, name: "Laptop", price: 1000, stock: 5 })); // "Product Laptop added successfully!"
-console.log(inventory.addProduct({ id: 2, name: "Mouse", price: 20, stock: 50 })); // "Product Mouse added successfully!"
+console.log(
+  inventory.addProduct({ id: 1, name: "Laptop", price: 1000, stock: 5 }),
+); // "Product Laptop added successfully!"
+console.log(
+  inventory.addProduct({ id: 2, name: "Mouse", price: 20, stock: 50 }),
+); // "Product Mouse added successfully!"
 console.log(inventory.updateProduct(1, { price: 900 })); // "Product 1 updated successfully!"
 console.log(inventory.getProduct(1)); // { id: 1, name: "Laptop", price: 900, stock: 5 }
 console.log(inventory.getAllProducts()); // List of all products
